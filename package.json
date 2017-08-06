@@ -1,8 +1,11 @@
 {
   "dependencies": {
     "bluebird": "^3.5.0",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
     "json2yaml": "^1.1.0",
     "lodash": "^4.17.4",
+    "morgan": "^1.8.2",
     "q": "^1.5.0"
   }
 }
