@@ -176,9 +176,11 @@ class ComposeController{
 			command: projectInfo.db.command
 		}
 		const composeData = j2y.stringify(this.template);
-		// write to file
-		return this.writeConfig(projectId, composeData).then(() => {
-			return this.docker.run(`docker-compose -p p_${projectId} -f ${__dirname}/compose-config/compose-${projectId}.yml up -d`);
+		return this.downloadImage().then(() => {
+			// write to file
+			return this.writeConfig(projectId, composeData).then(() => {
+				return this.docker.run(`docker-compose -p p_${projectId} -f ${__dirname}/compose-config/compose-${projectId}.yml up -d`);
+			})
 		})
 	}
 }
@@ -190,12 +192,6 @@ const composeController = new ComposeController({
 		db: 'mongo:3.2.0'
 	}
 });
-//composeController.downloadImage().then(() => {
-//	console.log('download image finish');
-//}).catch((err) => {
-//	console.log(err)
-//})
-//
 composeController.create('12de3151').then((result) => {
 	console.log(result)
 }).catch((err) => {
