@@ -45,7 +45,7 @@ class ComposeController{
 					name: 'servicce',
 					port: '10000',
 					path: '/Users/bugall/nodejs/austr/docker/testNodejsProject',
-					command: 'node /var/www/bin/www',
+					command: 'node /var/www/app.js',
 				},
 				db : {
 					name: 'db',
