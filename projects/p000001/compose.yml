@@ -1,0 +1,26 @@
+---
+  version: "2"
+  services: 
+    servicce: 
+      tty: true
+      image: "daocloud.io/node:7.7.4"
+      ports: 
+        - "10000:3000"
+      links:
+        - db
+      volumes: 
+        - "/Users/bugall/nodejs/austr/docker/projects/p000001/code:/var/www"
+      command: "node /var/www/index.js"
+      networks:
+        - all
+    db: 
+      tty: true
+      image: "daocloud.io/mongo:3.2.0"
+      ports: 
+        - "10001:27017"
+      volumes: 
+        - "/Users/bugall/nodejs/austr/docker/projects/p000001/db:/data"
+      networks:
+        - all
+  networks:
+    all:

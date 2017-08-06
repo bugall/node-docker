@@ -40,38 +40,24 @@ class ComposeController{
 		this.opts.image = config.image;
 
 		this.testProjectConfig = {
-			'12de3151': {
+			'p000001': {
 				service: {
 					name: 'servicce',
 					port: '10000',
-					path: '/Users/bugall/nodejs/austr/docker/testNodejsProject',
-					command: 'node /var/www/app.js',
+					path: __dirname + `/projects/p000001/code`,
+					command: 'node /var/www/index.js',
 				},
 				db : {
 					name: 'db',
 					port: '10001',
-					path: '/Users/bugall/nodejs/austr/docker/testDb',
-					command: 'mongod ',
+					path: __dirname + `/projects/p000001/db`,
 				}
 			}
 		}
 	}
 	writeConfig(projectId, data) {
 		return new Promise((resolve, reject) => {
-			const path = __dirname + '/compose-config';
-			if (!fs.existsSync(path)){
-				fs.mkdirSync(path);
-			}
-
-			if (!fs.existsSync(__dirname + 'testNodejsProject')){
-				fs.mkdirSync(__dirname + 'testNodejsProject');
-			}
-
-
-			if (!fs.existsSync(__dirname + 'testDb')){
-				fs.mkdirSync(__dirname + 'testDb');
-			}
-			fs.writeFile(__dirname + `/compose-config/compose-${projectId}.yml`, data, (err) => {
+			fs.writeFile(__dirname + `/projects/${projectId}/compose.yml`, data, (err) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -84,8 +70,8 @@ class ComposeController{
 		// check node image
 		return this.docker.run('docker images').then((result) => {
 			const list = result.split('\n');
-			const haveServiceImageFlag = false;
-			const haveDbImageFlag = false;
+			let haveServiceImageFlag = false;
+			let haveDbImageFlag = false;
 			const imageConfig = this.opts.image;
 			list.shift();
 
@@ -95,14 +81,16 @@ class ComposeController{
 					// check service image
 					//if (tmp[0] === '')
 					const imageVersion = `${tmp[0]}:${tmp[1]}`;
-					if (imageVersion === this.opts.image.service) {
+
+					if (imageVersion === `${this.opts.image.repository}${this.opts.image.service}`) {
 						haveServiceImageFlag = true;
 					}
-					if (imageVersion === this.opts.image.db) {
+					if (imageVersion === `${this.opts.image.repository}${this.opts.image.db}`) {
 						haveDbImageFlag = true;
 					}
 				}
 			})
+			console.log(haveDbImageFlag, haveServiceImageFlag)
 
 			const p = [];
 			console.log('begin to download service and db image');
@@ -160,11 +148,13 @@ class ComposeController{
 		const servicePort = projectInfo.service.port;
 		const dbPort = projectInfo.db.port;
 		const imageConfig = this.opts.image
+		console.log(projectInfo)
 
 		this.template.services[projectInfo.service.name] = {
 			tty: this.opts.openTTY,
 			image: imageConfig.repository + imageConfig.service,
 			ports: [`${servicePort}:3000`],
+			environment: [`db_host:db:${dbPort}`],
 			volumes: [`${projectInfo.service.path}:/var/www`],
 			command: projectInfo.service.command
 		}
@@ -179,7 +169,7 @@ class ComposeController{
 		return this.downloadImage().then(() => {
 			// write to file
 			return this.writeConfig(projectId, composeData).then(() => {
-				return this.docker.run(`docker-compose -p p_${projectId} -f ${__dirname}/compose-config/compose-${projectId}.yml up -d`);
+				return this.docker.run(`docker-compose -p p_${projectId} -f ${__dirname}/projects/${projectId}/compose.yml up -d`);
 			})
 		})
 	}
@@ -192,7 +182,7 @@ const composeController = new ComposeController({
 		db: 'mongo:3.2.0'
 	}
 });
-composeController.create('12de3151').then((result) => {
+composeController.create('p000001').then((result) => {
 	console.log(result)
 }).catch((err) => {
 	console.log(err);
