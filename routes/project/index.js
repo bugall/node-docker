@@ -1,43 +1,50 @@
 const express = require('express');
 const router = express.Router();
-const compose = require('../lib')
-const projects = {
-	'p000001': {
-		service: {
-			name: 'service',
-			port: 10000,
-			path: __dirname + '',
-		},
-		db: {
-			name: 'db',
-			port: 10001,
-			paht:
-		}
-	}
-}
-
+const Docker = require('../../lib');
+const docker = new Docker();
 
 router.get('/start/:projectId', function (req, res) {
 	const projectId = req.params['projectId'];
 	// get proejctId config info
-	const compose = new Compose({
-	})
-	
-})
+});
 
 router.get('/stop/:projectId', function (req, res) {
-})
+    const projectId = req.params['projectId'];
+    docker.stopContainer({ projectId }).then(() => {
+        res.send({
+            ack: 'SUCCESS',
+            msg: ''
+        });
+    }).catch((err) => {
+        console.log(err.stack);
+        res.send({
+            ack: 'error',
+            msg: ''
+        });
+    });
+});
 
 router.post('/:projectId', function(req,res, next) {
 	const projectId = req.params['projectId'];
-	const code_repo = req.body['code_repo'];
+	const image = req.body['image'];
 	const entrypoint = req.body['entrypoint'];
-	
-	
+    
+    docker.createContainer({ projectId, image, entrypoint }).then(() => {
+        res.send({
+            ack: 'SUCCESS',
+            msg: ''
+        });
+    }).catch((err) => {
+        res.send({
+            ack: 'error',
+            msg: ''
+        });
+    });
+});
 
-	res.send({
-		ack: 'SUCESS',
-		msg: ''
+router.get('/backup/:projectId', function(req, res, next) {
+	docker.createImage({fromImage: ''}, function (err, stream) {
+		stream.pipe(process.stdout);
 	});
 })
 
