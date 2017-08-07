@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser');
 const project = require('./routes/project');
+const docker = require('./routes/docker');
 const logger = require('morgan');
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 require('./common/mongo').db.on('connected', () => {
     app.use('/project', project);
+    app.use('/docker', docker);
     app.use(function (req, res, next) {
         const err = new Error('Not Found');
         err.status = 404;
