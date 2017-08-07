@@ -55,7 +55,7 @@ GET localhost:3000/project/start/p100005
 
 5. 备份一个容器
 ```
-GET localhost:3000/project/backup/p100006?name=backup&version=0.0.1
+GET localhost:3000/project/backup/p100005?name=backup&version=0.0.1
 
 name: 表示镜像的名字
 version: 表示镜像的版本号
