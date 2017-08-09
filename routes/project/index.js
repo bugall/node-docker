@@ -37,13 +37,17 @@ router.get('/stop/:projectId', function (req, res) {
 
 router.post('/:projectId', function(req,res, next) {
 	const projectId = req.params['projectId'];
-	const image = req.body['image'];
-	const entrypoint = req.body['entrypoint'];
-    
-    docker.createContainer({ 
-        projectId: projectId, 
+    const image = req.body['image'];
+    const sharedFolder = JSON.parse(req.body.sharedFolder);
+    const diskLimit = Number(req.body.diskLimit);
+    const processEnv = JSON.parse(req.body.processEnv);
+
+    docker.createContainer({
+        projectId: projectId,
         image: image,
-        entrypoint:entrypoint 
+        diskLimit: diskLimit * 1024 * 1024,
+        sharedFolder: sharedFolder,
+        processEnv: processEnv,
     }).then(() => {
         res.send({
             ack: 'SUCCESS',

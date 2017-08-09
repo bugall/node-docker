@@ -29,8 +29,10 @@ npm start
 POST http://localhost:3000/project/p100001
 
 body = {
-    image: daocloud.io/bugall_test/node:7.7.4-v4,
-    entrypoint: /var/www
+    image: daocloud.io/bugall_test/node:7.7.4-v5,
+    processEnv: ["db_host=172.17.0.5", "db_port=27017","db_name=p100007"],
+    diskLimit: 500 // 500M
+    sharedFolder: ["/User/bugall:/var/www/file"] // 共享，容器中/var/www/file 文件会出现在宿主机 /User/bugall中
 }
 ```
 容器默认只暴露3000端口
